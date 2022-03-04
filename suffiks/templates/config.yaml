@@ -8,4 +8,4 @@ data:
   config.yaml: |
     apiVersion: suffiks.suffiks.com/v1
     kind: ProjectConfig
-    {{- toYaml .Values.config | indent 4 }}
+{{ toYaml .Values.config | indent 4 }}

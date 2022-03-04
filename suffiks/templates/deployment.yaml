@@ -26,6 +26,9 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
+          args:
+            - --config-file
+            - /var/run/secrets/suffiks/config.yaml
           command:
             - /manager
           image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
@@ -58,6 +61,9 @@ spec:
           - mountPath: /tmp/k8s-webhook-server/serving-certs
             name: cert
             readOnly: true
+          - mountPath: /var/run/secrets/suffiks
+            name: config
+            readOnly: true
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       serviceAccountName: {{ include "suffiks.serviceAccountName" . }}
@@ -67,6 +73,10 @@ spec:
         secret:
           defaultMode: 420
           secretName: webhook-server-cert
+      - name: config
+        configMap:
+          defaultMode: 420
+          name: {{ include "suffiks.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
