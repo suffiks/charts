@@ -6,6 +6,6 @@ metadata:
   {{- include "suffiks.labels" . | nindent 4 }}
 data:
   config.yaml: |
-    apiVersion: suffiks.suffiks.com/v1
+    apiVersion: suffiks.com/v1
     kind: ProjectConfig
 {{ toYaml .Values.config | indent 4 }}
