@@ -1,0 +1,29 @@
+name: Helm build and release
+description: "Build and release helm chart"
+inputs:
+  directory:
+    description: "Directory to build helm chart"
+    required: true
+  remote:
+    description: "Remote chart oci path"
+    required: true
+    default: oci://ghcr.io/suffiks/charts
+  password:
+    description: "Password or personal access token used to log against the Docker registry"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Log in to the Container registry
+      uses: docker/login-action@dd4fa0671be5250ee6f50aedf4cb05514abda2c7
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ inputs.password }}
+    - name: "Build and release"
+      shell: "bash"
+      run: |
+        tmp_dir=$(mktemp -d)
+        cd ${{ inputs.directory }}
+        helm package --destination "$tmp_dir" .
+        helm push "$tmp_dir"/"$(ls -1 "$tmp_dir")" "${{ inputs.remote }}"

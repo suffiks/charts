@@ -1,0 +1,74 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/suffiks/suffiks
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "0.3.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+config:
+  health:
+    healthProbeBindAddress: :8091
+  leaderElection:
+    leaderElect: true
+    resourceName: 0ff08fbf.suffiks.com
+  metrics:
+    bindAddress: :8090
+  webhook:
+    port: 9443
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podSecurityContext:
+  runAsNonRoot: true
+
+securityContext:
+  allowPrivilegeEscalation: false
+
+podAnnotations: {}
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 30Mi
+  requests:
+    cpu: 100m
+    memory: 20Mi
+
+metricsService:
+  ports:
+    - name: https
+      port: 8443
+      targetPort: https
+  type: ClusterIP
+
+webhookService:
+  ports:
+    - port: 443
+      protocol: TCP
+      targetPort: 9443
+  type: ClusterIP
+
+configPorts:
+  health: 8091
+  metrics: 8090
+
+# Environment variables to set in the container.
+environment: []
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
