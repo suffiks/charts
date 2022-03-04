@@ -2,8 +2,9 @@ on:
   push:
     branches:
       - main
-    # paths:
-    #   - suffiks/**
+    paths:
+      - extension-traefik/**
+  workflow_dispatch:
 
 jobs:
   build-charts:
@@ -16,6 +17,5 @@ jobs:
       - name: "Build and release charts"
         uses: ./.github/actions/release
         with:
-          directory: suffiks
-          remote: oci://ghcr.io/suffiks/charts
+          directory: extension-traefik
           password: ${{ secrets.GITHUB_TOKEN }}

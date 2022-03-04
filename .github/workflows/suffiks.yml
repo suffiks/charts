@@ -1,0 +1,21 @@
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - suffiks/**
+  workflow_dispatch:
+
+jobs:
+  build-charts:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Build and release charts"
+        uses: ./.github/actions/release
+        with:
+          directory: suffiks
+          password: ${{ secrets.GITHUB_TOKEN }}
