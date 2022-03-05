@@ -15,6 +15,7 @@ spec:
     metadata:
       {{- with .Values.podAnnotations }}
       annotations:
+        kubectl.kubernetes.io/default-container: {{ .Chart.Name }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -33,20 +34,38 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- toYaml .Values.environment | nindent 12 }}
+            {{- if .Values.allowedDomains }}
+            - name: ALLOWED_DOMAINS
+              value: {{ range $index, $element := .Values.allowedDomains }}{{ if $index }},{{ end }}"{{ $element }}"{{ end }}
+            {{- end }}
+          args:
+            - --config-file
+            - /var/run/secrets/extension/config.yaml
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 4269
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
+          # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: /var/run/secrets/extension
+            name: config
+            readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          defaultMode: 420
+          name: {{ include "extension-traefik.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
