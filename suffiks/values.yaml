@@ -60,6 +60,13 @@ webhookService:
       targetPort: 9443
   type: ClusterIP
 
+docService:
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: doc
+  type: ClusterIP
+
 configPorts:
   health: 8091
   metrics: 8090

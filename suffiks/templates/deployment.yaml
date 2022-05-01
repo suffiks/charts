@@ -37,6 +37,9 @@ spec:
             - containerPort: {{ .Values.config.webhook.port }}
               name: webhook-server
               protocol: TCP
+            - containerPort: 8084
+              name: doc
+              protocol: TCP
           {{- with .Values.environment }}
           env:
             {{- toYaml . | nindent 12 }}
