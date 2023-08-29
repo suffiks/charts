@@ -26,9 +26,18 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
+          {{- with .Values.config }}
           args:
-            - --config-file
-            - /var/run/secrets/suffiks/config.yaml
+            {{ if .health.healthProbeBindAddress -}}
+            - --health-probe-bind-address={{ .health.healthProbeBindAddress }}
+            {{- end }}
+            {{ with .leaderElection -}}
+            - --leader-elect={{ .leaderElect }}
+            {{- end }}
+            {{ with .metrics -}}
+            - --metrics-bind-address={{.bindAddress}}
+            {{- end }}
+          {{- end }}
           command:
             - /manager
           image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}
@@ -64,9 +73,6 @@ spec:
           - mountPath: /tmp/k8s-webhook-server/serving-certs
             name: cert
             readOnly: true
-          - mountPath: /var/run/secrets/suffiks
-            name: config
-            readOnly: true
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       serviceAccountName: {{ include "suffiks.serviceAccountName" . }}
@@ -76,10 +82,6 @@ spec:
         secret:
           defaultMode: 420
           secretName: {{ include "suffiks.fullname" . }}-wh-cert
-      - name: config
-        configMap:
-          defaultMode: 420
-          name: {{ include "suffiks.fullname" . }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

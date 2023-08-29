@@ -10,16 +10,18 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+# Currently, config isn't really supported, except for flags.
+# So the commented lines below are not supported.
 config:
   health:
     healthProbeBindAddress: :8091
   leaderElection:
     leaderElect: true
-    resourceName: 0ff08fbf.suffiks.com
+    # resourceName: 0ff08fbf.suffiks.com
   metrics:
     bindAddress: :8090
   webhook:
-    port: 9443
+    port: 9443 # Do not change, not supported yet
 
 serviceAccount:
   # Specifies whether a service account should be created
